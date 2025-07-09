@@ -45,7 +45,6 @@ jobs:
 
       - name: Run tests
         run: mvn test --batch-mode --errors --fail-at-end
-        continue-on-error: true
 
       - name: Upload test results
         if: always()
