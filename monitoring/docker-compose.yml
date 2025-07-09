@@ -1,0 +1,43 @@
+services:
+  prometheus:
+    image: prom/prometheus:latest
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - "9090:9090"
+    networks:
+      - monitoring
+    restart: unless-stopped
+
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    volumes:
+      - grafana-data:/var/lib/grafana
+    networks:
+      - monitoring
+    restart: unless-stopped
+
+  github-actions-exporter:
+    image: webdevops/github-workflow-exporter:latest
+    environment:
+      - GITHUB_TOKEN=${GITHUB_PAT}
+      - GITHUB_REPOS=platform-engineer-tech-case-49378219
+      - GITHUB_ORGANIZATION=ashleytoole84
+      - SCRAPE_TIME=60s
+      - EXPORTER_LOG_LEVEL=debug
+    ports:
+      - "8080:8080"
+    networks:
+      - monitoring
+    restart: unless-stopped
+
+volumes:
+  grafana-data:
+
+networks:
+  monitoring:
+    driver: bridge
