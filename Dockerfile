@@ -6,7 +6,7 @@ COPY src ./src
 RUN mvn clean package -DskipTests
 
 # Create the runtime image
-FROM eclipse-temurin-17-jre
+FROM eclipse-temurin:17-jre
 WORKDIR /app
 COPY --from=builder /app/target/*.jar app.jar
 ENV JAVA_OPTS="-Xms512m -Xmx1024m"
