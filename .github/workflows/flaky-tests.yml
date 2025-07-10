@@ -27,20 +27,22 @@ jobs:
           echo "Raw FLAKY_TESTS: ${{ needs.flaky-tests.outputs.flaky-tests }}"
       - name: Display test results
         run: |
+
+          ALL_TESTS_RAW=$(echo "${{ needs.flaky-tests.outputs.all-tests }}" | tr -d '\n' | tr -d '\r')
+          FLAKY_TESTS_RAW=$(echo "${{ needs.flaky-tests.outputs.flaky-tests }}" | tr -d '\n' | tr -d '\r')
           python - <<EOF
           import json
           import re
 
-          all_tests_raw = "${{ needs.flaky-tests.outputs.all-tests }}"
-          flaky_tests_raw = "${{ needs.flaky-tests.outputs.flaky-tests }}"
+          all_tests_raw = "$ALL_TESTS_RAW"
+          flaky_tests_raw = "$FLAKY_TESTS_RAW"
 
           def clean_json(raw):
               if not raw or raw == "{}":
                   return {}
               try:
-
                   cleaned = re.sub(r'(\w+):', r'"\1":', raw)
-                  print(f"Cleaned ALL_TESTS: {cleaned}")  
+                  print(f"Cleaned ALL_TESTS: {cleaned}") 
                   return json.loads(cleaned)
               except json.JSONDecodeError as e:
                   print(f"JSONDecodeError in clean_json: {e} for raw: {raw}")
