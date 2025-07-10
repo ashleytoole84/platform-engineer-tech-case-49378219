@@ -21,6 +21,10 @@ jobs:
     steps:
       - name: Install jq
         run: sudo apt-get update && sudo apt-get install -y jq
+      - name: Debug Outputs
+        run: |
+          echo "Raw ALL_TESTS: ${{ needs.flaky-tests.outputs.all-tests }}"
+          echo "Raw FLAKY_TESTS: ${{ needs.flaky-tests.outputs.flaky-tests }}"
       - name: Display test results
         run: |
           ALL_TESTS="${{ needs.flaky-tests.outputs.all-tests }}"
