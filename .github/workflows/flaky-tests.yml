@@ -2,7 +2,7 @@
 name: Detect Flaky Tests
 
 on:
-  workflow_dispatch: # Manual trigger from GitHub UI
+  workflow_dispatch: 
 
 jobs:
   flaky-tests:
@@ -34,12 +34,17 @@ jobs:
           all_tests_raw = "${{ needs.flaky-tests.outputs.all-tests }}"
           flaky_tests_raw = "${{ needs.flaky-tests.outputs.flaky-tests }}"
 
-
           def clean_json(raw):
               if not raw or raw == "{}":
                   return {}
-              cleaned = re.sub(r'(\w+):', r'"\1":', raw)
-              return json.loads(cleaned)
+              try:
+
+                  cleaned = re.sub(r'(\w+):', r'"\1":', raw)
+                  print(f"Cleaned ALL_TESTS: {cleaned}")  
+                  return json.loads(cleaned)
+              except json.JSONDecodeError as e:
+                  print(f"JSONDecodeError in clean_json: {e} for raw: {raw}")
+                  return {}
 
           all_tests = clean_json(all_tests_raw)
           flaky_tests = clean_json(flaky_tests_raw)
