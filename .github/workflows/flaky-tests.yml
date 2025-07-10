@@ -12,7 +12,7 @@ jobs:
       runs-limit: 10
       branch: main
     secrets:
-      github-token: ${{ secrets.GITHUB_PAT }}
+      github-token: ${{ secrets.FLAKY_TEST_PAT }}
 
   report-results:
     needs: flaky-tests
