@@ -27,19 +27,37 @@ jobs:
           echo "Raw FLAKY_TESTS: ${{ needs.flaky-tests.outputs.flaky-tests }}"
       - name: Display test results
         run: |
-          ALL_TESTS="${{ needs.flaky-tests.outputs.all-tests }}"
-          FLAKY_TESTS="${{ needs.flaky-tests.outputs.flaky-tests }}"
-          echo "All Test Results:"
-          if [ -n "$ALL_TESTS" ] && [ "$ALL_TESTS" != "{}" ]; then
-            echo "$ALL_TESTS" | jq -r 'to_entries | .[] | "- \(.key): \(.value.pass) passes, \(.value.fail) failures"'
-          else
-            echo "No test results found."
-          fi
-          echo ""
-          echo "Flaky Test Results:"
-          if [ -n "$FLAKY_TESTS" ] && [ "$FLAKY_TESTS" != "{}" ]; then
-            echo "$FLAKY_TESTS" | jq -r 'to_entries | .[] | "- \(.key): failed \(.value) times"'
-          else
-            echo "No flaky tests detected."
-          fi
-          echo "Check 'Fetch and parse test artifacts' step logs for additional details."
+          python - <<EOF
+          import json
+          import re
+
+          all_tests_raw = "${{ needs.flaky-tests.outputs.all-tests }}"
+          flaky_tests_raw = "${{ needs.flaky-tests.outputs.flaky-tests }}"
+
+
+          def clean_json(raw):
+              if not raw or raw == "{}":
+                  return {}
+              cleaned = re.sub(r'(\w+):', r'"\1":', raw)
+              return json.loads(cleaned)
+
+          all_tests = clean_json(all_tests_raw)
+          flaky_tests = clean_json(flaky_tests_raw)
+
+          print("All Test Results:")
+          if all_tests and all_tests != {}:
+              for test, counts in all_tests.items():
+                  print(f"- {test}: {counts['pass']} passes, {counts['fail']} failures")
+          else:
+              print("No test results found.")
+
+          print("")
+          print("Flaky Test Results:")
+          if flaky_tests and flaky_tests != {}:
+              for test, fail_count in flaky_tests.items():
+                  print(f"- {test}: failed {fail_count} times")
+          else:
+              print("No flaky tests detected.")
+
+          print("Check 'Fetch and parse test artifacts' step logs for additional details.")
+          EOF
