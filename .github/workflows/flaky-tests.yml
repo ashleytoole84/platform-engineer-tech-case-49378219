@@ -1,3 +1,4 @@
+
 name: Detect Flaky Tests
 
 on:
@@ -5,9 +6,9 @@ on:
 
 jobs:
   flaky-tests:
-    uses: ashleytoole84/flaky-test-detector/.github/workflows/flaky-test-detector.yml@v1.0.0
+    uses: <org-name>/flaky-test-detector/.github/workflows/flaky-test-detector.yml@v1.0.0
     with:
-      repository: ashleytoole84/platform-engineer-tech-case-49378219
+      repository: <org-name>/platform-engineer-tech-case-49378219
       workflow-name: CI
       runs-limit: 10
       branch: main
@@ -18,8 +19,19 @@ jobs:
     needs: flaky-tests
     runs-on: ubuntu-latest
     steps:
-      - name: Display flaky test results
+      - name: Display test results
         run: |
+          echo "All Test Results:"
+          if [ -n "${{ needs.flaky-tests.outputs.all-tests }}" ] && [ "${{ needs.flaky-tests.outputs.all-tests }}" != "{}" ]; then
+            echo "${{ needs.flaky-tests.outputs.all-tests }}" | jq -r 'to_entries | .[] | "- \(.key): \(.value.pass) passes, \(.value.fail) failures"'
+          else
+            echo "No test results found."
+          fi
+          echo ""
           echo "Flaky Test Results:"
-          echo "${{ needs.flaky-tests.outputs.flaky-tests }}" | jq -r 'to_entries | .[] | "- \(.key): failed \(.value) out of ${{ inputs.runs-limit }} runs"'
-          echo "See artifact 'flaky-tests-summary' for details"
+          if [ -n "${{ needs.flaky-tests.outputs.flaky-tests }}" ] && [ "${{ needs.flaky-tests.outputs.flaky-tests }}" != "{}" ]; then
+            echo "${{ needs.flaky-tests.outputs.flaky-tests }}" | jq -r 'to_entries | .[] | "- \(.key): failed \(.value) times"'
+          else
+            echo "No flaky tests detected."
+          fi
+          echo "Check 'Fetch and parse test artifacts' step logs for additional details."
