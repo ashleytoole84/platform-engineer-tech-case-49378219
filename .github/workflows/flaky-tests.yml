@@ -6,9 +6,9 @@ on:
 
 jobs:
   flaky-tests:
-    uses: <org-name>/flaky-test-detector/.github/workflows/flaky-test-detector.yml@v1.0.0
+    uses: ashleytoole84/flaky-test-detector/.github/workflows/flaky-test-detector.yml@v1.0.0
     with:
-      repository: <org-name>/platform-engineer-tech-case-49378219
+      repository: ashleytoole84/platform-engineer-tech-case-49378219
       workflow-name: CI
       runs-limit: 10
       branch: main
