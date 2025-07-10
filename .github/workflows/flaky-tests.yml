@@ -10,7 +10,7 @@ jobs:
     with:
       repository: ashleytoole84/platform-engineer-tech-case-49378219
       workflow-name: CI
-      runs-limit: 10
+      runs-limit: 30
       branch: main
     secrets:
       github-token: ${{ secrets.FLAKY_TEST_PAT }}
