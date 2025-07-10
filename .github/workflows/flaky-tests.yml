@@ -1,0 +1,25 @@
+name: Detect Flaky Tests
+
+on:
+  workflow_dispatch: # Manual trigger from GitHub UI
+
+jobs:
+  flaky-tests:
+    uses: ashleytoole84/flaky-test-detector/.github/workflows/flaky-test-detector.yml@v1.0.0
+    with:
+      repository: ashleytoole84/platform-engineer-tech-case-49378219
+      workflow-name: CI
+      runs-limit: 10
+      branch: main
+    secrets:
+      github-token: ${{ secrets.GITHUB_PAT }}
+
+  report-results:
+    needs: flaky-tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Display flaky test results
+        run: |
+          echo "Flaky Test Results:"
+          echo "${{ needs.flaky-tests.outputs.flaky-tests }}" | jq -r 'to_entries | .[] | "- \(.key): failed \(.value) out of ${{ inputs.runs-limit }} runs"'
+          echo "See artifact 'flaky-tests-summary' for details"
