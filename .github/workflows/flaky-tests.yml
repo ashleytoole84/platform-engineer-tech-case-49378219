@@ -41,7 +41,8 @@ jobs:
               if not raw or raw == "{}":
                   return {}
               try:
-                  cleaned = re.sub(r'(\w+):', r'"\1":', raw)
+
+                  cleaned = re.sub(r'([^"\s{]+):', r'"\1":', raw)
                   print(f"Cleaned ALL_TESTS: {cleaned}") 
                   return json.loads(cleaned)
               except json.JSONDecodeError as e:
